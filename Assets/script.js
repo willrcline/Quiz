@@ -33,16 +33,17 @@ var timer
 var timerCount = 90
 var userScore = 0
 var questionNumber = 0
+var percentageScore
 
 var mainEl = document.querySelector('main')
 var isAnswerCorrectEl = document.querySelector('#is-answer-correct')
 //* var highestPossibleScore = questionsOptionsAnswers.length
 
-displayStartScreen()
+renderStartScreen()
 
-// ? displayStartScreen 
+// ? renderStartScreen 
 //* dynamically insert start button on page load (create, decorate, append)
-function displayStartScreen() {
+function renderStartScreen() {
     var h1El = document.createElement('h1')
     var startButtonEl = document.createElement("button")
 
@@ -87,15 +88,14 @@ function clearMain() {
 
 
 
-//? calculateScore
-//* return (userScore / highestPossibleScore ) * 100
 
 
 
-//?displayNextQuestion
+
+//?renderNextQuestion
 //* create, decorate append
 //* increment questionNumber var
-function displayNextQuestion() {
+function renderNextQuestion() {
 
     var questionEl = document.createElement("h2")
     var optionsEl = document.createElement('ol')
@@ -118,21 +118,50 @@ function displayNextQuestion() {
 
 
 
-//?displayHighscore
+//?renderHighscore
 //* localStorage.get()
-//* dynamically display list items
+//* dynamically render list items
 
 //? endTimer
 //* clearInterval
-//* set timerCount to 0 and update on display
+//* set timerCount to 0 and update on render
 
 //? endQuiz
 // * get score and show it (calculateScore)
 //* dynamically present input box for initials
 //* present submit button
 function endQuiz() {
-    var inputEl = document.createElement("input")
+    calculatePercentageScore()
+    clearMain()
+    renderEndScreen()
+}
+
+//? calculateScore
+//* return (userScore / highestPossibleScore ) * 100
+function calculatePercentageScore() {
+    percentageScore = (userScore / quizData.length ) * 100
+    return percentageScore
+}
+
+function renderEndScreen() {
+    var allDoneH2El = document.createElement("h2")
+    var scoreEl = document.createElement("h3")
+    var labelForInitialsInputEl = document.createElement("label")
+    var initialsInputEl = document.createElement("input")
     var submitButtonEl = document.createElement("button")
+    allDoneH2El.innerHTML = "All Done!"
+    scoreEl.innerHTML = "Your score: " + percentageScore
+    initialsInputEl.id = 'initials-input'
+    labelForInitialsInputEl.for = "initials-input"
+    labelForInitialsInputEl.innerHTML = "Enter Initials:"
+    submitButtonEl.innerHTML = "Submit"
+    submitButtonEl.addEventListener('click', handleEndScreenSubmit)
+
+    mainEl.append(allDoneH2El)
+    mainEl.append(scoreEl)
+    mainEl.append(labelForInitialsInputEl)
+    mainEl.append(initialsInputEl)
+    mainEl.append(submitButtonEl)
 }
 
 //?
@@ -140,7 +169,81 @@ function endQuiz() {
 //?event listener for submitInitials
 //? submitInitials
 //* .get() then add to highscores object in local storage (localstorage.set(list))
-//* displayHighscore()
+//* renderHighscore()
+function handleEndScreenSubmit() {
+    var userInitials = document.querySelector("#initials-input").value
+    userScoreObj = createObjectOfUserScore(userInitials)
+    addScoreToLocalStorage(userScoreObj)
+    clearMain()
+    renderHighScoreScreen() 
+}
+
+function renderHighScoreScreen() {
+    var h3El = document.createElement("h3")
+    var olEl = document.createElement('ol')
+    var restartButtonEl = document.createElement('button')
+    var clearHighScoresButtonEl = document.createElement('button')
+    
+    h3El.innerHTML = "High Scores"
+    restartButtonEl.innerHTML = "Play Again"
+    restartButtonEl.id = 'restart-quiz-button'
+    restartButtonEl.addEventListener("click", function () {
+        clearMain()
+        renderStartScreen()
+    })
+    clearHighScoresButtonEl.innerHTML = "Clear High Scores"
+    clearHighScoresButtonEl.id = "clear-high-scores-button"
+    clearHighScoresButtonEl.addEventListener('click', function () {
+        renderHighScoreScreen()
+        localStorageKey = "highScores"
+        localStorage.setItem(localStorageKey, []);
+    })
+
+    mainEl.append(h3El)
+    mainEl.append(olEl)
+    mainEl.append(restartButtonEl)
+    mainEl.append(clearHighScoresButtonEl)
+
+    var highScoresData = getHighScoresFromLocalStorage
+    console.log(highScoresData.type)
+    for (scoreEntry of highScoresData) {
+        var ulEl = document.createElement("ul")
+        var initialsliEl = document.createElement('li')
+        var scoreliEl = document.createElement('li')
+
+        initialsliEl.innerHTML = scoreEntry.initials
+        scoreliEl.innerHTML = scoreEntry.percentageScore
+        
+        ulEl.append(initialsliEl)
+        ulEl.append(scoreliEl)
+        olEl.append(ulEl)
+    }
+
+}
+
+
+function createObjectOfUserScore(userInitials) {
+    var userScoreObj = {
+        "initials": userInitials,
+        "percentageScore": percentageScore
+    }
+    return userScoreObj
+}
+
+function getHighScoresFromLocalStorage() {
+    var localStorageKey = "highScores"
+    const highScoresJSON = localStorage.getItem(localStorageKey);
+    let highScoresData = highScoresJSON ? JSON.parse(highScoresJSON) : [];
+
+    return highScoresData
+}
+
+function addScoreToLocalStorage(score) {
+    var localStorageKey = "highScores"
+    highScoresData = getHighScoresFromLocalStorage()
+    highScoresData.push(score);
+    localStorage.setItem(localStorageKey, JSON.stringify(highScoresData));
+}
 
 
 //? submitAnswer
@@ -153,20 +256,20 @@ function endQuiz() {
 //* if right answer, 
 //* increment userSore and insert "correct answer"
 //* if the question index doesn't exceed the length of the quiz
-//*display next question
+//*render next question
 //* otherwise, endQuiz()
 function submitAnswer(e) {
     var chosenOption = e.currentTarget.innerHTML
     if (questionNumber < quizData.length) {
         if (chosenOption == quizData[questionNumber -1].answer) {
             userScore ++
-            displayWhetherAnswerIsCorrect(true)
+            renderWhetherAnswerIsCorrect(true)
         } else {
             timerCount -= 5
-            displayWhetherAnswerIsCorrect(false)
+            renderWhetherAnswerIsCorrect(false)
         }
         clearMain()
-        displayNextQuestion()
+        renderNextQuestion()
     } else {
         clearMain()
         endQuiz()
@@ -175,7 +278,7 @@ function submitAnswer(e) {
 
 }
 
-function displayWhetherAnswerIsCorrect(answerIsCorrect) {
+function renderWhetherAnswerIsCorrect(answerIsCorrect) {
     if (answerIsCorrect) {
         isAnswerCorrectEl.innerHTML = "Correct!"
     } else {
@@ -192,9 +295,9 @@ function displayWhetherAnswerIsCorrect(answerIsCorrect) {
 // ? startQuiz function
 // * set vars to initial state
 // * start timer()
-//* displayNextQuestion
+//* renderNextQuestion
 
 document.querySelector('#start-button').addEventListener('click', () => {
     clearMain()
-    displayNextQuestion()
+    renderNextQuestion()
 })
