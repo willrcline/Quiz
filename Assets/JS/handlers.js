@@ -1,10 +1,11 @@
-import {globalVars, endQuiz} from './main.js'
-import { clearMain, resetGlobalQuizVars, createObjectOfUserScore, addScoreToLocalStorage } from "./utils.js"
+import {globalVars, endQuiz, setTimerInterval} from './main.js'
+import { clearScreen, resetGlobalQuizVars, createObjectOfUserScore, addScoreToLocalStorage, clearParentElement } from "./utils.js"
 import { renderNextQuestion, renderHighScoreScreen, renderWhetherAnswerIsCorrect} from './views.js'
 
 export function handleStartButton() {
-    clearMain()
+    clearParentElement(globalVars.mainEl)
     resetGlobalQuizVars()
+    setTimerInterval()
     renderNextQuestion()
 }
 
@@ -12,7 +13,7 @@ export function handleEndScreenSubmit() {
     var userInitials = document.querySelector("#initials-input").value
     var userScoreObj = createObjectOfUserScore(userInitials)
     addScoreToLocalStorage(userScoreObj)
-    clearMain()
+    clearParentElement(globalVars.mainEl)
     renderHighScoreScreen() 
 }
 
@@ -23,13 +24,13 @@ export function handleAnswerSubmit(e) {
             globalVars.userScore ++
             renderWhetherAnswerIsCorrect(true)
         } else {
-            globalVars.timerCount -= 5
+            globalVars.timeRemaining -= 5
             renderWhetherAnswerIsCorrect(false)
         }
-        clearMain()
+        clearScreen()
         renderNextQuestion()
     } else {
-        clearMain()
+        clearScreen()
         endQuiz()
     }
 }

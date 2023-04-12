@@ -3,6 +3,20 @@
     --white: #f0e1ea;
     --pale-green: #BACDB0;
     --dark-green: #729b79;
+    --blueish-gray: #475b63;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+}
+
+header a{
+    color: var(--blueish-gray)
+}
+
+header a:hover {
+    color: var(--dark-green)
 }
 
 body {

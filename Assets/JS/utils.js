@@ -1,17 +1,23 @@
 import { globalVars } from "./main.js"
 
 export function resetGlobalQuizVars() {
-    globalVars.timerCount = 90
+    globalVars.timeRemaining = 90
     globalVars.userScore = 0
     globalVars.questionNumber = 0
     globalVars.percentageScore = 0
 }
 
-export function clearMain() {
-    while (globalVars.mainEl.firstChild) {
-        globalVars.mainEl.removeChild(globalVars.mainEl.firstChild);
+export function clearParentElement(parentElement) {
+    while (parentElement.firstChild) {
+        parentElement.removeChild(parentElement.firstChild);
     }
 }
+
+export function clearScreen() {
+    clearParentElement(globalVars.mainEl)
+    clearParentElement(globalVars.headerEl)
+}
+
 
 export function calculatePercentageScore() {
     globalVars.percentageScore = (globalVars.userScore / globalVars.quizData.length ) * 100

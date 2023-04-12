@@ -1,14 +1,16 @@
 // import {timer} from "./globalVars"
-import {renderStartScreen, renderEndScreen} from './views.js'
-import {calculatePercentageScore, clearMain} from './utils.js'
+import {renderStartScreen, renderEndScreen, renderHeader} from './views.js'
+import {calculatePercentageScore, clearParentElement, clearScreen} from './utils.js'
 
 export var globalVars = {
-    timerCount: 90,
+    timerID: null,
+    timeRemaining: 90,
     userScore: 0,
     questionNumber: 0,
     percentageScore: 0,
     mainEl: document.querySelector('main'),
     isAnswerCorrectEl: document.querySelector('#is-answer-correct'),
+    headerEl: document.querySelector("header"),
     quizData: [
         {
             question: "Who is known as the 'Father of Computers'?",
@@ -39,31 +41,26 @@ export var globalVars = {
 }
 
 
-//? timer
-//* create interval
-//* decrement count var  
-//* update on screen 
-//* clear interval
-    // if (timerCount === 0) {
-    //     // Clears interval
-    //     clearInterval(timer);
-    //     endQuiz();
-    // }
+export function setTimerInterval() {
+    globalVars.timerID = setInterval(function timerIncrement() {
+        if (globalVars.timeRemaining >= 0) {
+            clearParentElement(globalVars.headerEl)
+            renderHeader()
+            // ToDO: instead of running renderHeader() over and over, just change the innerHTML of the timer display
+            // var timerEl = document.querySelector("#timer")
+            // timerEl.innerHTML = "Time: " + globalVars.timeRemaining
+        } else {
+            clearInterval(globalVars.timerID)
+            endQuiz()
+        }
+        globalVars.timeRemaining --
+    }, 1000);
+}
 
-//? endTimer
-//* clearInterval
-//* set timerCount to 0 and update on render
-
-
-
-
-//? endQuiz
-// * get score and show it (calculateScore)
-//* dynamically present input box for initials
-//* present submit button
 export function endQuiz() {
+    clearInterval(globalVars.timerID)
     calculatePercentageScore()
-    clearMain()
+    clearScreen()
     renderEndScreen()
 }
 
