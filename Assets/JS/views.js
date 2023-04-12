@@ -1,6 +1,10 @@
+import { globalVars } from './main.js'
+import {handleAnswerSubmit, handleStartButton, handleEndScreenSubmit} from './handlers.js'
+import { clearMain, getHighScoresFromLocalStorage } from './utils.js'
+
 // ? renderStartScreen 
 //* dynamically insert start button on page load (create, decorate, append)
-function renderStartScreen() {
+export function renderStartScreen() {
     var h1El = document.createElement('h1')
     var startButtonEl = document.createElement("button")
 
@@ -8,50 +12,46 @@ function renderStartScreen() {
     startButtonEl.innerHTML = "Get Started"
     startButtonEl.addEventListener('click', handleStartButton)
     
-    mainEl.appendChild(h1El)
-    mainEl.appendChild(startButtonEl)
+    globalVars.mainEl.appendChild(h1El)
+    globalVars.mainEl.appendChild(startButtonEl)
     
 }
 
-//?renderNextQuestion
-//* create, decorate append
-//* increment questionNumber var
-function renderNextQuestion() {
+export function renderNextQuestion() {
 
     var questionEl = document.createElement("h2")
     var optionsEl = document.createElement('ol')
-    questionEl.innerHTML = quizData[questionNumber].question
-    mainEl.appendChild(questionEl)
-    mainEl.appendChild(optionsEl)
+    questionEl.innerHTML = globalVars.quizData[globalVars.questionNumber].question
+    globalVars.mainEl.appendChild(questionEl)
+    globalVars.mainEl.appendChild(optionsEl)
 
-    for (i = 0; i < 4; i++) {
+    for (var i = 0; i < 4; i++) {
         var liEl = document.createElement('li')
         var optionEl = document.createElement('button')
-        optionEl.innerHTML = quizData[questionNumber].options[i]
+        optionEl.innerHTML = globalVars.quizData[globalVars.questionNumber].options[i]
         liEl.append(optionEl)
         optionsEl.append(liEl)
-        optionEl.addEventListener('click', submitAnswer)
+        optionEl.addEventListener('click', handleAnswerSubmit)
     }
 
-
-    questionNumber ++
+    globalVars.questionNumber ++
 }
 
 
-function renderWhetherAnswerIsCorrect(answerIsCorrect) {
+export function renderWhetherAnswerIsCorrect(answerIsCorrect) {
     if (answerIsCorrect) {
-        isAnswerCorrectEl.innerHTML = "Correct!"
+        globalVars.isAnswerCorrectEl.innerHTML = "Correct!"
     } else {
-        isAnswerCorrectEl.innerHTML = "Wrong answer"
+        globalVars.isAnswerCorrectEl.innerHTML = "Wrong answer"
     }
     setTimeout(() => {
-        isAnswerCorrectEl.innerHTML = ""
-        isAnswerCorrectEl.style
+        globalVars.isAnswerCorrectEl.innerHTML = ""
+        globalVars.isAnswerCorrectEl.style
     }, 3000);
 }
 
 
-function renderHighScoreScreen() {
+export function renderHighScoreScreen() {
     var h3El = document.createElement("h3")
     var olEl = document.createElement('ol')
     var restartButtonEl = document.createElement('button')
@@ -67,16 +67,16 @@ function renderHighScoreScreen() {
     clearHighScoresButtonEl.innerHTML = "Clear High Scores"
     clearHighScoresButtonEl.id = "clear-high-scores-button"
     clearHighScoresButtonEl.addEventListener('click', function () {
-        localStorageKey = "highScores"
+        var localStorageKey = "highScores"
         localStorage.setItem(localStorageKey, []);
         clearMain()
         renderHighScoreScreen()
     })
 
-    mainEl.append(h3El)
-    mainEl.append(olEl)
-    mainEl.append(restartButtonEl)
-    mainEl.append(clearHighScoresButtonEl)
+    globalVars.mainEl.append(h3El)
+    globalVars.mainEl.append(olEl)
+    globalVars.mainEl.append(restartButtonEl)
+    globalVars.mainEl.append(clearHighScoresButtonEl)
 
     var highScoresData = getHighScoresFromLocalStorage()
     console.log(highScoresData.type)
@@ -96,23 +96,23 @@ function renderHighScoreScreen() {
 }
 
 
-function renderEndScreen() {
+export function renderEndScreen() {
     var allDoneH2El = document.createElement("h2")
     var scoreEl = document.createElement("h3")
     var labelForInitialsInputEl = document.createElement("label")
     var initialsInputEl = document.createElement("input")
     var submitButtonEl = document.createElement("button")
     allDoneH2El.innerHTML = "All Done!"
-    scoreEl.innerHTML = "Your score: " + percentageScore
+    scoreEl.innerHTML = "Your score: " + globalVars.percentageScore
     initialsInputEl.id = 'initials-input'
     labelForInitialsInputEl.for = "initials-input"
     labelForInitialsInputEl.innerHTML = "Enter Initials:"
     submitButtonEl.innerHTML = "Submit"
     submitButtonEl.addEventListener('click', handleEndScreenSubmit)
 
-    mainEl.append(allDoneH2El)
-    mainEl.append(scoreEl)
-    mainEl.append(labelForInitialsInputEl)
-    mainEl.append(initialsInputEl)
-    mainEl.append(submitButtonEl)
+    globalVars.mainEl.append(allDoneH2El)
+    globalVars.mainEl.append(scoreEl)
+    globalVars.mainEl.append(labelForInitialsInputEl)
+    globalVars.mainEl.append(initialsInputEl)
+    globalVars.mainEl.append(submitButtonEl)
 }
